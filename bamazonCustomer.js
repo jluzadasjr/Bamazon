@@ -17,31 +17,79 @@ var connection = mysql.createConnection({
 });
 
 // connect to the mysql server and sql database
-connection.connect(function(err) {
+connection.connect(function (err) {
   if (err) throw err;
+  console.log("connection");
   // run the start function after the connection is made to prompt the user
   start();
 });
 
 // function which prompts the user for what action they should take
 function start() {
-  inquirer
-    .prompt({
-      name: "postOrBid",
-      type: "list",
-      message: "Would you like to [POST] an auction or [BID] on an auction?",
-      choices: ["POST", "BID", "EXIT"]
+  // connection.query("SELECT * FROM products", function (err, result) {
+  //   if (err) throw err;
+  //   console.table(result);
+  // }); buy()
+  getProducts()
+  buy()
+}
+function getProducts() {
+  connection.query("SELECT * FROM products", function (err, result) {
+    if (err) throw err;
+    console.table(result);
+  });
+}
+
+function buy() {
+  inquirer.prompt([
+    {
+      name: "item",
+      type: "input",
+      message: "What item would you like to buy?"
+    },
+    {
+      name: "quantity",
+      type: "input",
+      message: "How many units would you like to buy?",
+      validate: function (value) {
+        if (isNaN(value) === false) {
+          return true;
+        }
+        return false;
+      }
+    }
+  ])
+    .then(function (answer) {
+      connection.query(
+        "SELECT * FROM products WHERE item_id = ?",
+        [
+          answer.item
+        ],
+
+        function (err, result) {
+          if (err) throw err;
+          if (Number(result[0].stock_quantity) < answer.quantity) {
+            console.log("Insufficient Quantity!");
+          } else {
+            connection.query("UPDATE products SET ? WHERE ?",
+              [
+                {
+                  stock_quantity: answer.quantity
+                },
+    
+                {
+                  id: answer.id
+                }
+              ]
+            );
+          }
+          console.log(JSON.stringify(result));
+          console.log(typeof result[0].stock_quantity);
+          console.table(result);
+        }
+      )
+      // return console.log(answer.item);
+
     })
-    .then(function(answer) {
-      // based on their answer, either call the bid or the post functions
-      if (answer.postOrBid === "POST") {
-        postAuction();
-      }
-      else if(answer.postOrBid === "BID") {
-        bidAuction();
-      } else{
-        connection.end();
-      }
-    });
 }
 
