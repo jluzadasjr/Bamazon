@@ -78,7 +78,7 @@ function buy() {
         [
           answer.item
         ],
-
+//if the customer tries to buy more than the available quantity, then a message will show up. 
         function (err, result) {
           if (err) throw err;
           if (result[0].stock_quantity < answer.quantity) {
