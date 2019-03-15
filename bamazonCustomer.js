@@ -58,7 +58,20 @@ function buy() {
         return false;
       }
     }
-  ])
+  ]).then(function (newQuantity) {
+    if ((result[id].stock_quantity - newQuantity.quantity) > 0) {
+      connection.query('UPDATE products SET ? stock_quatity=' 
+      +(result[id].stock_quantity-answer.quantity)+
+      "(result[id).stock_quantity-answer.quantity)+' WHERE product_name=' " + product
+        + "'", function (err, res2) {
+          console.log("Product Purchased!");
+          getProducts()
+        })
+    } else {
+      console.log("Not a valid selection!");
+      buy(result);
+    }
+  })
     .then(function (answer) {
       connection.query(
         "SELECT * FROM products WHERE item_id = ?",
@@ -68,7 +81,7 @@ function buy() {
 
         function (err, result) {
           if (err) throw err;
-          if (Number(result[0].stock_quantity) < answer.quantity) {
+          if (result[0].stock_quantity < answer.quantity) {
             console.log("Insufficient Quantity!");
           } else {
             connection.query("UPDATE products SET ? WHERE ?",
@@ -76,11 +89,16 @@ function buy() {
                 {
                   stock_quantity: answer.quantity
                 },
-    
+
                 {
                   id: answer.id
                 }
-              ]
+              ],
+              function (error) {
+                if (error) throw err;
+                console.log("Purchase complete");
+                start();
+              }
             );
           }
           console.log(JSON.stringify(result));
@@ -88,8 +106,6 @@ function buy() {
           console.table(result);
         }
       )
-      // return console.log(answer.item);
-
+      return console.log(answer.item);
     })
-}
-
+  }

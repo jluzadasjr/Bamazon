@@ -15,7 +15,7 @@ INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES( 'Apples', 'Food', .50, 5000);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES('Bananas', 'Food', .50, 5000) ;
+VALUES('Bananas', 'Food', .50, 5000);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES('Eggs', 'Food', 5, 3000);
@@ -41,4 +41,4 @@ VALUES ('Apple Watch', 'Electronics', 300, 200);
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ('iPhone', 'Electonics', 1000, 500);
 
-
+SELECT * FROM products; 
