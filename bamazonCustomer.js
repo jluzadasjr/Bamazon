@@ -39,7 +39,7 @@ function getProducts() {
     console.table(result);
   });
 }
-
+// function that prompts user on what item they'd like to buy and how many
 function buy() {
   inquirer.prompt([
     {
