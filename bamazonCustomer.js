@@ -19,93 +19,67 @@ var connection = mysql.createConnection({
 // connect to the mysql server and sql database
 connection.connect(function (err) {
   if (err) throw err;
-  console.log("connection");
-  // run the start function after the connection is made to prompt the user
-  start();
+  console.log("connection success");
+  // run the makeTable function after the connection is made to prompt the user
+  makeTable();
 });
 
 // function which prompts the user for what action they should take
-function start() {
-  // connection.query("SELECT * FROM products", function (err, result) {
-  //   if (err) throw err;
-  //   console.table(result);
-  // }); buy()
-  getProducts()
-  buy()
-}
-function getProducts() {
+var makeTable = function () {
   connection.query("SELECT * FROM products", function (err, result) {
-    if (err) throw err;
-    console.table(result);
+    for (var i = 0; i < result.length; i++) {
+      console.log(result[i].item_id + " || " + result[i].product_name + " || " +
+        result[i].department_name + " || " + result[i].price + " || " +
+        result[i].stock_quantity + "\n");
+    }
+    customerPrompt();
   });
 }
+
 // function that prompts user on what item they'd like to buy and how many
-function buy() {
-  inquirer.prompt([
-    {
+var customerPrompt = function(res) {
+  inquirer.
+    prompt([{
       name: "item",
       type: "input",
       message: "What item would you like to buy?"
-    },
-    {
-      name: "quantity",
-      type: "input",
-      message: "How many units would you like to buy?",
-      validate: function (value) {
-        if (isNaN(value) === false) {
-          return true;
-        }
-        return false;
-      }
-    }
-  ]).then(function (newQuantity) {
-    if ((result[id].stock_quantity - newQuantity.quantity) > 0) {
-      connection.query('UPDATE products SET ? stock_quatity=' 
-      +(result[id].stock_quantity-answer.quantity)+
-      "(result[id).stock_quantity-answer.quantity)+' WHERE product_name=' " + product
-        + "'", function (err, res2) {
-          console.log("Product Purchased!");
-          getProducts()
-        })
-    } else {
-      console.log("Not a valid selection!");
-      buy(result);
-    }
-  })
-    .then(function (answer) {
-      connection.query(
-        "SELECT * FROM products WHERE item_id = ?",
-        [
-          answer.item
-        ],
-//if the customer tries to buy more than the available quantity, then a message will show up. 
-        function (err, result) {
-          if (err) throw err;
-          if (result[0].stock_quantity < answer.quantity) {
-            console.log("Insufficient Quantity!");
-          } else {
-            connection.query("UPDATE products SET ? WHERE ?",
-              [
-                {
-                  stock_quantity: answer.quantity
-                },
-
-                {
-                  id: answer.id
+    }]).then(function (answer) {
+      var correct = false;
+      for (var i = 0; i < customerPrompt.length; i++) {
+        if (customerPrompt[i].product_name == answer.choice) {
+          correct = true;
+          var product = answer.choice;
+          var id = i;
+          inquirer.
+            prompt({
+              name: "quantity",
+              type: "input",
+              message: "How many units would you like to buy?",
+              validate: function (value) {
+                if (isNaN(value) === false) {
+                  return true;
+                } else {
+                  return false;
                 }
-              ],
-              function (error) {
-                if (error) throw err;
-                console.log("Purchase complete");
-                start();
               }
-            );
-          }
-          console.log(JSON.stringify(result));
-          console.log(typeof result[0].stock_quantity);
-          console.table(result);
+            }).then(function (answer) {
+              if ((res[id].stock_quantity - answer.quantity) > 0) {
+                connection.query("UPDATE products SET stock_quatity=' "
+                  + (res[id].stock_quantity - answer.quantity) + " ' WHERE product_name= ' "
+                  + product + " ' ", function (err, res2) {
+                    console.log("Product Purchased!");
+                    makeTable();
+                  })
+              } else
+                console.log("Not a valid selection!");
+              customerPrompt();
+            })
         }
-      )
-      return console.log(answer.item);
+      }
+      // when customer makes wrong choice, the "Not a valid choice" message will show up.  
+      if (i == customerPrompt.length && correct == false) {
+        console.log("Not a valid choice!");
+        customerPrompt();
+      }
     })
-  }
+};
