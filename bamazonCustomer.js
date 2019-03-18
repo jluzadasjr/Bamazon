@@ -27,6 +27,7 @@ connection.connect(function (err) {
 // function which prompts the user for what action they should take
 var makeTable = function () {
   connection.query("SELECT * FROM products", function (err, result) {
+    // console.log(result)
     for (var i = 0; i < result.length; i++) {
       console.log(result[i].item_id + " || " + result[i].product_name + " || " +
         result[i].department_name + " || " + result[i].price + " || " +
@@ -38,15 +39,16 @@ var makeTable = function () {
 
 // function that prompts user on what item they'd like to buy and how many
 var customerPrompt = function(res) {
-  inquirer.
-    prompt([{
+  console.log(customerPrompt);
+  inquirer.prompt([{
       name: "item",
       type: "input",
       message: "What item would you like to buy?"
     }]).then(function (answer) {
+      console.log(answer)
       var correct = false;
-      for (var i = 0; i < customerPrompt.length; i++) {
-        if (customerPrompt[i].product_name == answer.choice) {
+      for (var i = 0; i < res; i++) {
+        if (res[i].product_name == answer.choice) {
           correct = true;
           var product = answer.choice;
           var id = i;
@@ -77,7 +79,7 @@ var customerPrompt = function(res) {
         }
       }
       // when customer makes wrong choice, the "Not a valid choice" message will show up.  
-      if (i == customerPrompt.length && correct == false) {
+      if (i == res && correct == false) {
         console.log("Not a valid choice!");
         customerPrompt();
       }
